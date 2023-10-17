@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gantt Chart with D3.js</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .grid line {
+      stroke: lightgray; 
+    }
+    #drawer {
+    position: fixed;
+    top: 0;
+    right: -300px; /* Assuming the width of the drawer is 300px and it's initially hidden */
+    width: 300px;
+    height: 100%;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+    transition: right 0.3s ease-in-out; /* This line adds the smooth transition effect */
+}
+  </style>
+</head>
+
+<body>
+  <script>
+    const vertices = [
+      {
+        "id": "sha256:6a38b13eea10abc9faf174f8cded2d4a94d7b9e78f4439b911fd30e8d8f0fc7b",
+        "name": "resolve image config for docker.io/library/node:20-alpine",
+        "durationMs": 1609,
+        "createdAt": "2023-10-12T12:59:41.802527348Z",
+        "startedAt": "2023-10-12T12:59:41.801761157Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:43.410633523Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "from node:20-alpine",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": []
+      },
+      {
+        "id": "sha256:509d1f4fd5bf4dcce0987e4904ca6d64e22b7e621ad83ee9ec05e04fda21a81d",
+        "name": "importing cache manifest from dagger:10686922502337221602",
+        "durationMs": 0,
+        "createdAt": "2023-10-12T12:59:43.424178178Z",
+        "startedAt": "2023-10-12T12:59:43.423924911Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:43.423959515Z",
+        "pipeline": null,
+        "inputs": []
+      },
+      {
+        "id": "sha256:5efa7a15db50750d941afb32a824cb0e5724229aa91dfe074671a0d04bd7ab98",
+        "name": "upload /builds/jobilla/backend-services/omnia/frontend/application/admin",
+        "durationMs": 1674,
+        "createdAt": "2023-10-12T12:59:43.424822859Z",
+        "startedAt": "2023-10-12T12:59:43.424362792Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:45.09868709Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "host.directory /builds/jobilla/backend-services/omnia/frontend/application/admin",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": []
+      },
+      {
+        "id": "sha256:68a4820a0d4438d43b1054b9653f7236873e5888e4a48a702a908cd7b4f79849",
+        "name": "pull docker.io/library/node:20-alpine",
+        "durationMs": 2768,
+        "createdAt": "2023-10-12T12:59:43.424822859Z",
+        "startedAt": "2023-10-12T12:59:43.424399021Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:46.192209173Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "from node:20-alpine",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": ["process \"docker-entrypoint.sh npm run build -- --mode production\" did not complete successfully: exit code: 2"]
+      },
+      {
+        "id": "sha256:b527c4794c248089a750844b238e1bfe3866838828bbf271c26f80ec395d39e8",
+        "name": "copy /builds/jobilla/backend-services/omnia/frontend/application/admin",
+        "durationMs": 116,
+        "createdAt": "2023-10-12T12:59:45.103869312Z",
+        "startedAt": "2023-10-12T12:59:45.103580212Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:45.219909867Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "host.directory /builds/jobilla/backend-services/omnia/frontend/application/admin",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:5efa7a15db50750d941afb32a824cb0e5724229aa91dfe074671a0d04bd7ab98"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:0a1578c39f3345b35aafa192af9b6f645aec511767ea264cd1b8738e99e1b67a",
+        "name": "exec docker-entrypoint.sh corepack enable",
+        "durationMs": 2096,
+        "createdAt": "2023-10-12T12:59:46.194165193Z",
+        "startedAt": "2023-10-12T12:59:46.193934414Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:48.289180026Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:68a4820a0d4438d43b1054b9653f7236873e5888e4a48a702a908cd7b4f79849",
+          "sha256:b527c4794c248089a750844b238e1bfe3866838828bbf271c26f80ec395d39e8"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:c1cdef37affc8a813511bd195cf8f3a73aed17f66673baa887d8ed0a47e02f58",
+        "name": "exec docker-entrypoint.sh corepack prepare pnpm@latest --activate",
+        "durationMs": 1224,
+        "createdAt": "2023-10-12T12:59:48.292883742Z",
+        "startedAt": "2023-10-12T12:59:48.292487571Z",
+        "completed": true,
+        "completedAt": "2023-10-12T12:59:49.516305849Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:0a1578c39f3345b35aafa192af9b6f645aec511767ea264cd1b8738e99e1b67a"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:bf9dd411f0c53f8aa9e4f1ecd1f3f3d5f7e14d85220f3f51d2ca99164d481f10",
+        "name": "exec docker-entrypoint.sh pnpm install",
+        "durationMs": 11552,
+        "createdAt": "2023-10-12T12:59:49.520145803Z",
+        "startedAt": "2023-10-12T12:59:49.519763693Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:01.07186224Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:c1cdef37affc8a813511bd195cf8f3a73aed17f66673baa887d8ed0a47e02f58"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:3738b5a88fa0a076802b44eaf36c6a8a14fd589008e8abcc8e79fda9ab02ce72",
+        "name": "exec docker-entrypoint.sh npm run build -- --mode production",
+        "durationMs": 30670,
+        "createdAt": "2023-10-12T13:00:01.075450895Z",
+        "startedAt": "2023-10-12T13:00:01.075066627Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:31.745093465Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:bf9dd411f0c53f8aa9e4f1ecd1f3f3d5f7e14d85220f3f51d2ca99164d481f10",
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:50ece92f20ea041541e2825eee78bfdb0b6142d03922cf210e0dcf20a723fcf3",
+        "name": "resolve image config for docker.io/library/nginx:1.23-alpine",
+        "durationMs": 8821,
+        "createdAt": "2023-10-12T13:00:31.764652547Z",
+        "startedAt": "2023-10-12T13:00:31.764156183Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.5854672Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "from nginx:1.23-alpine",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": []
+      },
+      {
+        "id": "sha256:424c863b3f0fb7db4c6f2ebbdbce51fd70253305f3d9ef6cd9d8fac11dc336cc",
+        "name": "upload /builds/jobilla/backend-services/omnia/build/dagger/constructs/build/nginx",
+        "durationMs": 6841,
+        "createdAt": "2023-10-12T13:00:33.791017752Z",
+        "startedAt": "2023-10-12T13:00:33.790158232Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.631258565Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "host.directory /builds/jobilla/backend-services/omnia/build/dagger/constructs/build/nginx",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": []
+      },
+      {
+        "id": "sha256:e231d5b346885b0ebb5f482c8b36572760b056245bb4235c591045a5cdcdae1c",
+        "name": "pull docker.io/library/nginx:1.23-alpine",
+        "durationMs": 7009,
+        "createdAt": "2023-10-12T13:00:33.791624714Z",
+        "startedAt": "2023-10-12T13:00:33.79027259Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.799965641Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "from nginx:1.23-alpine",
+            "description": null
+          }
+        ],
+        "inputs": [],
+        "errors": []
+      },
+      {
+        "id": "sha256:e53150724bcf949bb3f8f9fcdfcd02d681b4f899865d1f97d5a7f3f0042eca16",
+        "name": "copy /builds/jobilla/backend-services/omnia/build/dagger/constructs/build/nginx",
+        "durationMs": 6986,
+        "createdAt": "2023-10-12T13:00:33.814848231Z",
+        "startedAt": "2023-10-12T13:00:33.814507792Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.800430223Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          },
+          {
+            "name": "host.directory /builds/jobilla/backend-services/omnia/build/dagger/constructs/build/nginx",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:424c863b3f0fb7db4c6f2ebbdbce51fd70253305f3d9ef6cd9d8fac11dc336cc"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:29c8d32ccd9e220c84c9949d33b1ed77b9e44d52be2e670a11b41723381cf9ad",
+        "name": "copy /dist /app",
+        "durationMs": 5665,
+        "createdAt": "2023-10-12T13:00:35.135758215Z",
+        "startedAt": "2023-10-12T13:00:35.135431181Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.800430223Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:e231d5b346885b0ebb5f482c8b36572760b056245bb4235c591045a5cdcdae1c",
+          "sha256:3738b5a88fa0a076802b44eaf36c6a8a14fd589008e8abcc8e79fda9ab02ce72"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:1e32d2c9d6262c6a37e19d8ffdcfd6bad81bcf569e406fc3f81e93c5bec5c7d1",
+        "name": "copy /nginx.conf /etc/nginx/nginx.conf",
+        "durationMs": 5585,
+        "createdAt": "2023-10-12T13:00:35.21592309Z",
+        "startedAt": "2023-10-12T13:00:35.215584734Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.800480097Z",
+        "pipeline": [
+          {
+            "name": "",
+            "description": null
+          }
+        ],
+        "inputs": [
+          "sha256:29c8d32ccd9e220c84c9949d33b1ed77b9e44d52be2e670a11b41723381cf9ad",
+          "sha256:e53150724bcf949bb3f8f9fcdfcd02d681b4f899865d1f97d5a7f3f0042eca16"
+        ],
+        "errors": []
+      },
+      {
+        "id": "sha256:36678741368a0297a670c5d7410e131b5ce3b7d9084c946ca9d80053681b8fcb",
+        "name": "exporting to image",
+        "durationMs": 4784,
+        "createdAt": "2023-10-12T13:00:35.242383525Z",
+        "startedAt": "2023-10-12T13:00:35.242090591Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:40.026647432Z",
+        "pipeline": null,
+        "inputs": []
+      },
+      {
+        "id": "sha256:996587028fb4edfa39ed73f69700d245d0e1dfbc9707aa9acac1c62d5f993951",
+        "name": "exporting to image",
+        "durationMs": 868,
+        "createdAt": "2023-10-12T13:00:40.802496255Z",
+        "startedAt": "2023-10-12T13:00:40.801945196Z",
+        "completed": true,
+        "completedAt": "2023-10-12T13:00:41.669582177Z",
+        "pipeline": null,
+        "inputs": []
+      }];
+
+    vertices.forEach(d => {
+      d.startedAt = new Date(d.startedAt);
+      d.completedAt = new Date(d.completedAt);
+    });
+
+    // Set up dimensions
+    const margin = { top: 20, right: 10, bottom: 10, left: 400 };
+    const width = 2000 - margin.left - margin.right;
+    const height = 800 - margin.top - margin.bottom;
+
+    // Create an SVG element
+    const svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    const startTime = d3.min(vertices, d => new Date(d.startedAt));
+    const endTime = d3.max(vertices, d => new Date(d.completedAt));
+    const totalDuration = endTime - startTime;
+    const tickInterval = totalDuration / 6;
+
+
+    // Set up scales
+    const xScale = d3.scaleLinear()
+      .domain([startTime, endTime])
+      .range([0, width - margin.left - margin.right]);
+
+    const xAxis = d3.axisBottom(xScale)
+      .tickValues(d3.range(0, 7).map(d => new Date(startTime.getTime() + d * tickInterval)))
+      .tickFormat(d => `${d - startTime}ms`);
+
+    const yScale = d3.scaleBand()
+      .domain(vertices.map(d => d.name))
+      .range([0, height])
+      .padding(0.4);
+
+    // Add the bars
+    const rects = svg.selectAll(".bar")
+      .data(vertices)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => xScale(new Date(d.startedAt)))
+      .attr("y", d => yScale(d.name))
+      .attr("width", d => xScale(new Date(d.completedAt)) - xScale(new Date(d.startedAt)))
+      .attr("height", yScale.bandwidth())
+      .attr("fill", d => d.errors && d.errors.length > 0 ? "red" : "steelblue")
+      .on("mouseover", function (event, d) {
+        if (d.errors && d.errors.length > 0) {
+          d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background-color", "white")
+            .style("padding", "5px")
+            .style("border", "1px solid black")
+            .style("border-radius", "5px")
+            .style("pointer-events", "none")
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 10) + "px")
+            .html(d.errors.join("<br>"));
+        }
+      })
+      .on("mouseout", function () {
+        d3.select(".tooltip").remove();
+      });
+
+
+      
+      svg.selectAll(".durationText")
+      .data(vertices)
+      .enter().append("text")
+      .attr("class", "durationText")
+      .attr("x", d => xScale(d.completedAt))
+      .attr("y", d => yScale(d.name) + yScale.bandwidth() / 2) // Vertically center the text
+      .attr("dy", ".35em") // Adjust position to make the text truly vertically centered
+      .attr("dx", "5") // Small horizontal padding for better aesthetics
+      .text(d => `${d.durationMs}ms`) // Display duration
+      .attr("font-size", "11px"); // Adjust font size as needed
+      
+
+    // Function to determine if the arrow should curve to avoid overlapping a bar
+    function needsCurve(parentTask, childTask) {
+      return yScale(parentTask.name) < yScale(childTask.name);
+    }
+
+    // Function to generate curved paths for arrows
+    function curvedPath(x1, y1, x2, y2) {
+      const midY = (y1 + y2) / 2;
+      return `M${x1},${y1} Q${x1},${midY} ${x2},${y2}`;
+    }
+    
+    rects.on("click", (event, d) => openDrawer(event, d));
+    function openDrawer(event, d) {
+        event.stopPropagation();
+
+        // Remove existing drawer, if any
+        d3.select(".drawer").remove();
+
+        // Create a new drawer
+        const drawerWidth = 600; // You can adjust this value
+        const drawerHeight = height; // Make the drawer as tall as the SVG
+
+        const drawer = svg.append("g")
+          .attr("class", "drawer")
+          .attr("transform", `translate(${width - drawerWidth}, 0)`);
+
+        // Background
+        drawer.append("rect")
+          .attr("width", drawerWidth)
+          .attr("height", drawerHeight)
+          .attr("fill", "#f8f8f8")
+          .attr("stroke", "#bbb");
+
+        // Add any content you'd like inside the drawer
+        // Here's an example displaying the task name:
+        drawer.append("text")
+          .attr("x", 10)
+          .attr("y", 30)
+          .attr("fill", "#333")
+          .text(`Task: ${d.name}`);
+      }
+
+    // Attach a click event listener to the SVG
+      svg.on("click", () => {
+        d3.select(".drawer").remove();
+      });
+
+
+    // Add the arrows for parent-child connections
+    vertices.forEach(task => {
+        if (task.inputs && task.inputs.length > 0) {
+          task.inputs.forEach(inputId => {
+            const parentTask = vertices.find(v => v.id === inputId);
+
+            const x1 = xScale(parentTask.completedAt);
+            const y1 = yScale(parentTask.name) + yScale.bandwidth() / 2;
+            const x2 = xScale(task.startedAt);
+            const y2 = yScale(task.name) + yScale.bandwidth() / 2;
+
+            if (needsCurve(parentTask, task)) {
+              svg.append("path")
+                .attr("d", curvedPath(x1, y1, x2, y2))
+                .attr("stroke", "black")
+                .attr("stroke-width", 1.5)
+                .attr("fill", "none")
+                .attr("marker-end", "url(#arrow)");
+            } else {
+              svg.append("line")
+                .attr("x1", x1)
+                .attr("y1", y1)
+                .attr("x2", x2)
+                .attr("y2", y2)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1.5)
+                .attr("marker-end", "url(#arrow)");
+            }
+          });
+        }
+      });
+
+      // Define arrow markers for parent-child connections
+      svg.append("defs").append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 5)
+        .attr("refY", 0)
+        .attr("markerWidth", 5)
+        .attr("markerHeight", 5)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("class", "arrowHead");
+
+    // Add the X axis
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(xAxis);
+
+    // Add the Y axis
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(d3.axisLeft(yScale))
+      .selectAll("text")
+      .style("font-size", "12px");
+
+
+    // Add horizontal gridlines
+      svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", "translate(0,0)")
+        .call(d3.axisLeft(yScale)
+          .tickSize(-width)
+          .tickFormat("")
+        )
+        .attr("stroke-opacity", "0.2"); // Adjust the opacity to your liking
+
+      // Add vertical gridlines
+        svg.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(xScale)
+            .tickSize(-height)
+            .tickFormat("")
+          )
+          .attr("stroke-opacity", "0.2");  // Adjust the opacity to your liking
+
+  </script>
+
+</body>
+
+</html>
